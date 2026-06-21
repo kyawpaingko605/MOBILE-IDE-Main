@@ -8,7 +8,7 @@ android {
 
     defaultConfig {
         applicationId "com.ide.aiide"
-        minSdk 21
+        minSdk 26 // 👈 ၂၁ နေရာတွင် ၂၆ သို့ ပြောင်းလဲလိုက်ပါသည်
         targetSdk 34
         versionCode 1
         versionName "1.0"
@@ -26,7 +26,7 @@ dependencies {
     implementation 'androidx.core:core-ktx:1.12.0'
     implementation 'org.json:json:20230227'
     
-    // ✅ AppCompat (ဒါထည့်ပါ)
+    // ✅ AppCompat 
     implementation 'androidx.appcompat:appcompat:1.6.1'
     
     // ✅ Material Components

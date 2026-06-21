@@ -8,11 +8,21 @@ android {
 
     defaultConfig {
         applicationId "com.ide.aiide"
-        minSdk 26 // 👈 ၂၁ နေရာတွင် ၂၆ သို့ ပြောင်းလဲလိုက်ပါသည်
+        minSdk 26 
         targetSdk 34
         versionCode 1
         versionName "1.0"
     }
+
+    // ⬇️ Java နှင့် Kotlin ဗားရှင်း တူညီအောင် ဤနေရာတွင် ညှိပေးလိုက်ပါသည်
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+    // ⬆️
 
     buildTypes {
         release {

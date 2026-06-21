@@ -5,8 +5,8 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        // AGP Version ကို 7.4.0 မှ 7.4.4 သို့ မြှင့်လိုက်ပါသည် (Kotlin 1.9.0 နှင့် ပိုမိုကိုက်ညီစေရန်)
-        classpath 'com.android.tools.build:gradle:7.4.4'
+        // ဗားရှင်းအမှန်ဖြစ်သော 7.4.2 သို့ ပြောင်းလဲထားပါသည်
+        classpath 'com.android.tools.build:gradle:7.4.2'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }

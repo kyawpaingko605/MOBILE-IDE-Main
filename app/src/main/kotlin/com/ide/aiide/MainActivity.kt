@@ -1,5 +1,6 @@
 package com.ide.aiide
 
+import android.app.Activity
 import android.app.Dialog
 import android.graphics.Color
 import android.graphics.Typeface
@@ -17,11 +18,10 @@ import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity // 👈 Import ကို မြှင့်ထားပါတယ်
 import org.json.JSONArray
 import org.json.JSONObject
 
-class MainActivity : AppCompatActivity() { // 👈 AppCompatActivity သို့ ပြောင်းလဲထားပါတယ်
+class MainActivity : Activity() {
 
     private lateinit var inputMessage: EditText
     private lateinit var btnSend: Button
@@ -303,7 +303,7 @@ class MainActivity : AppCompatActivity() { // 👈 AppCompatActivity သို�
 
         val sessions = chatHistory.loadSessions()
         val sessionIndex = sessions.indexOfFirst { it.id == currentSessionId }
-        if (sessionIndex!= -1 && sessions[sessionIndex].messages.isEmpty()) {
+        if (sessionIndex != -1 && sessions[sessionIndex].messages.isEmpty()) {
             chatHistory.updateSession(currentSessionId, currentMessages)
             loadAllSessions()
         }

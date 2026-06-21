@@ -21,9 +21,12 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
-      # gradlew မရှိတဲ့အတွက် chmod အဆင့်ကို ဖြုတ်လိုက်ပြီး gradle ကို တိုက်ရိုက်သုံးပါမည်
+      # အရင် 'gradle assembleDebug' နေရာမှာ အောက်ပါအတိုင်း ပြောင်းသုံးပါ
       - name: Build with Gradle
-        run: gradle assembleDebug
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.5' # Gradle Version ကို 8.5 သို့ ပုံသေလျှော့ချသတ်မှတ်ခြင်း
+          arguments: assembleDebug
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4

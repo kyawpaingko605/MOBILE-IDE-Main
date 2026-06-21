@@ -21,13 +21,9 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
-      # မလိုအပ်တဲ့ ဒေါင်းလုဒ်ဆွဲခြင်း နှင့် Unzip အဆင့်များကို ဖယ်ရှားလိုက်ပါပြီ
-
-      - name: Grant Execute Permission for Gradlew
-        run: chmod +x ./gradlew
-
+      # gradlew မရှိတဲ့အတွက် chmod အဆင့်ကို ဖြုတ်လိုက်ပြီး gradle ကို တိုက်ရိုက်သုံးပါမည်
       - name: Build with Gradle
-        run: ./gradlew assembleDebug
+        run: gradle assembleDebug
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4

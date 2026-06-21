@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/bg_floating_window"
+    android:elevation="24dp"
+    android:padding="8dp">
+
+    <!-- Title Bar -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="@drawable/bg_chat_bot"
+        android:padding="8dp"
+        android:radius="8dp">
+
+        <TextView
+            android:id="@+id/tvPreviewTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="📱 Live Preview"
+            android:textColor="?android:textColorPrimary"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btnMinimizeFloatingPreview"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="@drawable/bg_send_button"
+            android:text="−"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp"
+            android:layout_marginEnd="4dp" />
+
+        <Button
+            android:id="@+id/btnCloseFloatingPreview"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="@drawable/bg_send_button"
+            android:text="✕"
+            android:textColor="#FFFFFF"
+            android:textSize="14sp" />
+    </LinearLayout>
+
+    <!-- Preview Content -->
+    <FrameLayout
+        android:id="@+id/floatingPreviewContainer"
+        android:layout_width="match_parent"
+        android:layout_height="400dp"
+        android:background="@drawable/bg_input"
+        android:padding="8dp"
+        android:layout_marginTop="8dp" />
+
+</LinearLayout>

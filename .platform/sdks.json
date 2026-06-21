@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "sdks": [
+    {
+      "name": "android",
+      "bootClasspath": [
+        "/storage/emulated/0/Android/data/com.tyron.code/files/codeassist/android.jar"
+      ],
+      "buildTools": null
+    }
+  ]
+}

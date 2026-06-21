@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?><resources>
+<color name="background">#1A1A2E</color>
+<color name="surface">#2D2D3D</color>
+<color name="surfaceVariant">#3D3D4D</color>
+<color name="onSurface">#FFFFFF</color>
+<color name="onSurfaceVariant">#B0B0D0</color>
+<color name="primary">#1A1A2E</color>
+<color name="chatUser">#1A1A2E</color>
+<color name="chatBot">#3D3D4D</color>
+<color name="chatUserText">#FFFFFF</color>
+<color name="chatBotText">#FFFFFF</color>
+<color name="inputBackground">#3D3D4D</color>
+<color name="inputHint">#9CA3AF</color>
+<color name="inputStroke">#565869</color>
+<color name="statusBar">#1A1A2E</color>
+<color name="navigationBar">#1A1A2E</color>
+<color name="error">#EF4444</color>
+<color name="white">#FFFFFF</color>
+<color name="black">#000000</color>
+<color name="transparent">#00000000</color>
+<color name="ic_launcher_background">#1A1A2E</color>
+<color name="ic_launcher_foreground">#FFFFFF</color>
+<style name="Theme.M3" parent="android:Theme.Holo.NoActionBar">
+        <!-- Status Bar -->
+        <item name="android:statusBarColor">#1A1A2E</item>
+        <item name="android:windowBackground">#1A1A2E</item>
+        <item name="android:colorBackground">#1A1A2E</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:navigationBarColor">#1A1A2E</item>
+        
+        <!-- Text Colors -->
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:textColorPrimary">#FFFFFF</item>
+        <item name="android:textColorSecondary">#B0B0D0</item>
+    </style>
+</resources>

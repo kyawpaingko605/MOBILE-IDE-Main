@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.M3" parent="android:Theme.Holo.NoActionBar">
+        <!-- Status Bar -->
+        <item name="android:statusBarColor">#1A1A2E</item>
+        <item name="android:windowBackground">#1A1A2E</item>
+        <item name="android:colorBackground">#1A1A2E</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:navigationBarColor">#1A1A2E</item>
+        
+        <!-- Text Colors -->
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:textColorPrimary">#FFFFFF</item>
+        <item name="android:textColorSecondary">#B0B0D0</item>
+    </style>
+</resources>

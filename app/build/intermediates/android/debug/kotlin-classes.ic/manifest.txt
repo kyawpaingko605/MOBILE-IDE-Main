@@ -1,0 +1,19 @@
+ctx	aad551bb3173b465c1ee10b24b0359a4
+s	/storage/emulated/0/Android/data/com.tyron.code/files/codeassist/projects/ai-ide/app/src/main/kotlin/com/ide/aiide/MainActivity.kt	aa91e9def6393eb2bedc3b4043cc649e
+s	/storage/emulated/0/Android/data/com.tyron.code/files/codeassist/projects/ai-ide/app/src/main/kotlin/com/ide/aiide/ApiService.kt	e7a4c7f4c798f45653d3061dafc09ee3
+s	/storage/emulated/0/Android/data/com.tyron.code/files/codeassist/projects/ai-ide/app/src/main/kotlin/com/ide/aiide/ChatHistory.kt	875edca5cc6e73d1a81da9a4c48143e1
+s	/storage/emulated/0/Android/data/com.tyron.code/files/codeassist/projects/ai-ide/app/src/main/kotlin/com/ide/aiide/LoginActivity.kt	7d1c41728a4813e7b2e1ba6a3736ad3d
+s	/storage/emulated/0/Android/data/com.tyron.code/files/codeassist/projects/ai-ide/app/src/main/kotlin/com/ide/aiide/FloatingPreviewDialog.kt	83b791035f1c88bae319d19eb6a50662
+o	/storage/emulated/0/Android/data/com.tyron.code/files/codeassist/projects/ai-ide/app/src/main/kotlin/com/ide/aiide/ChatHistory.kt	com/ide/aiide/ChatHistory.class,com/ide/aiide/ChatHistory$ChatMessage.class,com/ide/aiide/ChatHistory$ChatSession.class
+o	/storage/emulated/0/Android/data/com.tyron.code/files/codeassist/projects/ai-ide/app/src/main/kotlin/com/ide/aiide/MainActivity.kt	com/ide/aiide/MainActivity.class,com/ide/aiide/MainActivity$setupWebPreview$1.class
+o	/storage/emulated/0/Android/data/com.tyron.code/files/codeassist/projects/ai-ide/app/src/main/kotlin/com/ide/aiide/ApiService.kt	com/ide/aiide/ApiService.class
+o	/storage/emulated/0/Android/data/com.tyron.code/files/codeassist/projects/ai-ide/app/src/main/kotlin/com/ide/aiide/LoginActivity.kt	com/ide/aiide/LoginActivity.class
+o	/storage/emulated/0/Android/data/com.tyron.code/files/codeassist/projects/ai-ide/app/src/main/kotlin/com/ide/aiide/FloatingPreviewDialog.kt	com/ide/aiide/FloatingPreviewDialog.class
+a	com/ide/aiide/ApiService.class	40a134d8b84a1484f12328ad336eea0a
+a	com/ide/aiide/ChatHistory$ChatMessage.class	167a7f96da604b3cbf71ea6996a6ed48
+a	com/ide/aiide/ChatHistory$ChatSession.class	c8577fb3289f1660b3c7c57829d541cf
+a	com/ide/aiide/ChatHistory.class	58f76bf4200d976f4056d3c79b0cade3
+a	com/ide/aiide/FloatingPreviewDialog.class	791f7e5fb12c1440e7c12f565f919612
+a	com/ide/aiide/LoginActivity.class	f73ae0c04fb0301ebf46eb4cd0bafa07
+a	com/ide/aiide/MainActivity$setupWebPreview$1.class	9ac2db15c081d97eb604edefb071073f
+a	com/ide/aiide/MainActivity.class	cdc6e4292f953736688b76e1403aadb4

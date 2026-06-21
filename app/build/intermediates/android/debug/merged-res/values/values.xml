@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?><resources>
+<string name="app_name">IT Expert AI</string>
+<string name="api_key">gsk_...</string>
+<string name="api_url">https://api.groq.com/openai/v1/chat/completions</string>
+<string name="default_web_client_id">YOUR_GOOGLE_CLIENT_ID</string>
+<string name="login_title">IT Expert AI</string>
+<string name="login_subtitle">Sign in to continue</string>
+<string name="login_google">Sign in with Google</string>
+<string name="login_guest">Continue as Guest</string>
+<string name="login_secure">Your data is securely stored in the cloud</string>
+<string name="login_enter_name">Enter your name</string>
+<string name="login_start_chat">Start Chatting</string>
+<string name="settings_title">API Settings</string>
+<string name="settings_api_key_hint">gsk_...</string>
+<string name="settings_create_key">Create New API Key</string>
+<string name="settings_save">Save</string>
+<string name="settings_cancel">Cancel</string>
+<string name="settings_hint">Save your API key after creating it</string>
+<string name="chat_welcome">Hello! I am IT Expert AI. How can I help you?</string>
+<string name="chat_welcome_no_key">Please add your Groq API key in Settings.</string>
+<string name="chat_welcome_key_saved">API Key saved! Ask me anything.</string>
+<string name="chat_typing">AI is thinking...</string>
+<string name="chat_input_hint">Type a message...</string>
+<string name="chat_send">Send</string>
+<string name="toast_enter_message">Please enter a message</string>
+<string name="toast_enter_api_key">Please enter API Key</string>
+<string name="toast_enter_groq_key">Please enter Groq API Key</string>
+<string name="toast_enter_name">Please enter your name</string>
+<string name="toast_key_saved">Groq API Key saved!</string>
+<string name="toast_history_cleared">All history cleared</string>
+<string name="toast_session_deleted">Session deleted</string>
+<string name="toast_create_key">Opening Groq Console to create API Key</string>
+<string name="toast_guest_failed">Guest sign-in failed</string>
+<string name="toast_auth_failed">Authentication failed</string>
+<string name="toast_google_failed">Google Sign-In failed</string>
+<string name="menu_new">New</string>
+<string name="menu_settings">Settings</string>
+<string name="menu_clear">Clear All</string>
+<string name="menu_history">Chat History</string>
+<string name="api_connected">API: Connected</string>
+<string name="api_not_connected">API: Not Connected</string>
+<string name="error_401">Invalid API Key. Please check your key.</string>
+<string name="error_413">Chat history too large. Please clear history and try again.</string>
+<string name="error_429">Too many requests. Please wait a moment.</string>
+<string name="error_500">Server error. Please try again later.</string>
+<string name="error_network">Network error. Please check your internet connection.</string>
+<string name="history_count">conversations</string>
+<string name="history_new_chat">New Chat</string>
+<color name="background">#F5F5F5</color>
+<color name="surface">#FFFFFF</color>
+<color name="surfaceVariant">#E8E8E8</color>
+<color name="onSurface">#1A1A2E</color>
+<color name="onSurfaceVariant">#4A4A5A</color>
+<color name="primary">#1A1A2E</color>
+<color name="chatUser">#1A1A2E</color>
+<color name="chatBot">#E8E8E8</color>
+<color name="chatUserText">#FFFFFF</color>
+<color name="chatBotText">#1A1A2E</color>
+<color name="inputBackground">#FFFFFF</color>
+<color name="inputHint">#4A4A5A</color>
+<color name="inputStroke">#CCCCCC</color>
+<color name="statusBar">#F5F5F5</color>
+<color name="navigationBar">#F5F5F5</color>
+<color name="error">#EF4444</color>
+<color name="white">#FFFFFF</color>
+<color name="black">#000000</color>
+<color name="transparent">#00000000</color>
+<color name="ic_launcher_background">#1A1A2E</color>
+<color name="ic_launcher_foreground">#FFFFFF</color>
+<style name="Theme.M3" parent="android:Theme.Holo.NoActionBar">
+        <!-- Status Bar -->
+        <item name="android:statusBarColor">#F5F5F5</item>
+        <item name="android:windowBackground">#F5F5F5</item>
+        <item name="android:colorBackground">#F5F5F5</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:navigationBarColor">#F5F5F5</item>
+        
+        <!-- Text Colors -->
+        <item name="android:textColor">#1A1A2E</item>
+        <item name="android:textColorPrimary">#1A1A2E</item>
+        <item name="android:textColorSecondary">#4A4A5A</item>
+    </style>
+</resources>

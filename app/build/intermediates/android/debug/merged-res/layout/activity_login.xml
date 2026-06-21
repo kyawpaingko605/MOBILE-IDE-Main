@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:background="@drawable/bg_login_gradient"
+    android:padding="32dp">
+
+    <!-- Logo Circle (Glass) -->
+    <LinearLayout
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:background="@drawable/bg_logo_circle"
+        android:elevation="12dp"
+        android:layout_marginBottom="20dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="🤖"
+            android:textSize="56sp" />
+
+    </LinearLayout>
+
+    <!-- Title -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="IT Expert AI"
+        android:textColor="#FFFFFF"
+        android:textSize="28sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="4dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="ဆက်လက်ရန်"
+        android:textColor="#B0B0D0"
+        android:textSize="16sp"
+        android:layout_marginBottom="32dp" />
+
+    <!-- Guest Button (Glass) -->
+    <Button
+        android:id="@+id/btnGuestSignIn"
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:background="@drawable/bg_login_button"
+        android:text="🚀 စတင်သုံးစွဲမည်"
+        android:textColor="#FFFFFF"
+        android:textSize="18sp"
+        android:elevation="4dp" />
+
+    <!-- Footer -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="🔒 အကောင့်မလိုပါ"
+        android:textColor="#6A6A8A"
+        android:textSize="12sp"
+        android:layout_marginTop="20dp" />
+
+</LinearLayout>

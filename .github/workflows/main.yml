@@ -1,0 +1,30 @@
+name: Build and Unzip Tools
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Create Assets Directory
+        run: mkdir -p app/src/main/assets/bin_tools
+
+      - name: Download Tools Zip
+        # -fL ထည့်ထားခြင်းဖြင့် Error ဖြစ်ရင် ချက်ချင်းရပ်သွားမည်ဖြစ်ပြီး Redirect လမ်းကြောင်းနောက်သို့ လိုက်ပါလိမ့်မည်
+        run: |
+          curl -fL -o tools.zip "YOUR_DOWNLOAD_URL"
+
+      - name: Debug Zip File (Optional)
+        # အကယ်၍ Error ထပ်တက်ပါက File အမျိုးအစား အစစ်အမှန်ကို စစ်ဆေးရန်
+        run: file tools.zip
+
+      - name: Unzip Tools
+        run: unzip tools.zip -d app/src/main/assets/bin_tools

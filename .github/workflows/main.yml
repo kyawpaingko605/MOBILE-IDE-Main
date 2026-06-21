@@ -21,19 +21,7 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
-      - name: Create Assets Directory
-        run: mkdir -p app/src/main/assets/bin_tools
-
-      - name: Download Tools Zip
-        # ⚠️ အောက်က "YOUR_ACTUAL_ZIP_URL" နေရာမှာ သင့်ရဲ့ bin_tools.zip ရှိတဲ့ Link အစစ်အမှန်ကို သေချာလဲပေးပါ
-        run: |
-          curl -fL -o tools.zip "YOUR_ACTUAL_ZIP_URL"
-
-      - name: Unzip Tools
-        run: unzip tools.zip -d app/src/main/assets/bin_tools
-
-      - name: Remove Zip File (Cleanup)
-        run: rm tools.zip
+      # မလိုအပ်တဲ့ ဒေါင်းလုဒ်ဆွဲခြင်း နှင့် Unzip အဆင့်များကို ဖယ်ရှားလိုက်ပါပြီ
 
       - name: Grant Execute Permission for Gradlew
         run: chmod +x ./gradlew

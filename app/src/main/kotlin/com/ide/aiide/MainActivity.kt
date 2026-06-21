@@ -303,7 +303,7 @@ class MainActivity : AppCompatActivity() { // 👈 AppCompatActivity သို�
 
         val sessions = chatHistory.loadSessions()
         val sessionIndex = sessions.indexOfFirst { it.id == currentSessionId }
-        if (sessionIndex -1 && sessions[sessionIndex].messages.isEmpty()) {
+        if (sessionIndex!= -1 && sessions[sessionIndex].messages.isEmpty()) {
             chatHistory.updateSession(currentSessionId, currentMessages)
             loadAllSessions()
         }

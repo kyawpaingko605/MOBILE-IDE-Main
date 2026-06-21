@@ -35,10 +35,10 @@ class MainActivity : Activity() {
     private lateinit var sideMenu: LinearLayout
     private lateinit var mainContent: LinearLayout
     private lateinit var tvHistoryCount: TextView
+    private lateinit var tvLiveStatus: TextView
     private lateinit var tvApiStatus: TextView
     private lateinit var tvUserName: TextView
     private lateinit var previewContainer: FrameLayout
-    private lateinit var tvLiveStatus: TextView
     private lateinit var btnFloatingPreview: Button
     private lateinit var btnClosePreview: Button
     private lateinit var previewArea: LinearLayout
@@ -60,6 +60,9 @@ class MainActivity : Activity() {
     private val MIN_REQUEST_INTERVAL = 5000L
     
     private lateinit var floatingPreviewDialog: FloatingPreviewDialog
+    
+    // AI ထုတ်ပေးလိုက်တဲ့ HTML ကုဒ်ကို သိမ်းထားရန် Variable
+    private var currentParsedHtml: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -219,9 +222,9 @@ class MainActivity : Activity() {
         chatContainer.removeAllViews()
         
         val welcomeMsg = if (apiKey.isEmpty()) {
-            "👋 Hello $userName! Please add your Groq API Key in Settings ⚙️\n\n💡 Try: 'Create a login screen'"
+            "👋 Hello $userName! Please add your Groq API Key in Settings ⚙️\n\n💡 Try: 'Create a login screen using HTML'"
         } else {
-            "🚀 Hello $userName! I am IT Expert AI (Powered by Groq).\n\n💡 Try: 'Create a login screen'"
+            "🚀 Hello $userName! I am IT Expert AI (Powered by Groq).\n\n💡 Try: 'Create a login screen using HTML'"
         }
         
         addBotMessageUI(welcomeMsg)
@@ -333,132 +336,83 @@ class MainActivity : Activity() {
         )
     }
 
+    // ✅ ပြင်ဆင်ထားသော စစ်မှန်သည့် Dynamic WebView Preview စနစ်
     private fun renderLayoutPreview(response: String) {
         try {
-            val lowerResponse = response.lowercase()
-            
-            val uiKeywords = listOf(
-                "login", "screen", "ui", "layout", "button", 
-                "edittext", "textview", "imageview", "linearlayout",
-                "relativelayout", "constraintlayout", "scrollview",
-                "recyclerview", "cardview", "material", "design",
-                "xml", "web", "html", "python", "flutter"
-            )
-            
-            val hasUI = uiKeywords.any { lowerResponse.contains(it) }
-            
-            if (hasUI || response.contains("<?xml") || response.contains("<html")) {
-                buildLoginScreenUI()
-                showFloatingPreview()
+            // AI ထုတ်ပေးတဲ့စာသားထဲက HTML ကုဒ်အပိုင်းအစကို ရှာဖွေဖြတ်ထုတ်ယူခြင်း
+            val htmlContent = if (response.contains("<html>")) {
+                response.substring(response.indexOf("<html>"), response.lastIndexOf("</html>") + 7)
+            } else if (response.contains("<!DOCTYPE html>")) {
+                val startIndex = response.indexOf("<!DOCTYPE html>")
+                val endIndex = if (response.contains("</html>")) response.lastIndexOf("</html>") + 7 else response.length
+                response.substring(startIndex, endIndex)
+            } else if (response.contains("```html")) {
+                val start = response.indexOf("```html") + 7
+                val end = response.indexOf("```", start)
+                response.substring(start, end)
             } else {
-                showTextPreview(response)
+                // အကယ်၍ ကုဒ်မဟုတ်ဘဲ သာမန်စာသားဆိုလျှင် လှပသော HTML Card ပုံစံဖြင့် Render လုပ်ပေးခြင်း
+                """
+                <html>
+                <head>
+                    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+                    <style>
+                        body { background-color: #1A1A2E; color: #FFFFFF; font-family: -apple-system, sans-serif; padding: 20px; margin: 0; line-height: 1.6; }
+                        .card { background: #222244; padding: 16px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+                    </style>
+                </head>
+                <body>
+                    <div class='card'>${response.replace("\n", "<br>")}</div>
+                </body>
+                </html>
+                """.trimIndent()
+            }
+
+            // Floating Window အတွက် HTML ကုဒ်ကို Variable ထဲသိမ်းဆည်းခြင်း
+            currentParsedHtml = htmlContent
+
+            runOnUiThread {
+                previewContainer.removeAllViews() // အရင်က Native Layout အဟောင်းများကို ရှင်းထုတ်ခြင်း
+                
+                previewArea.visibility = View.VISIBLE
+                webPreview.visibility = View.VISIBLE
+                
+                // WebView ထဲသို့ ကုဒ်ကို တိုက်ရိုက်ထည့်သွင်းပြီး Run ခိုင်းခြင်း
+                webPreview.loadDataWithBaseURL(null, htmlContent, "text/html", "UTF-8", null)
+                
+                tvLiveStatus.text = "● Live Dynamic UI Preview"
+                tvLiveStatus.setTextColor(Color.parseColor("#10A37F"))
             }
             
         } catch (e: Exception) {
-            showPreviewError("Error: ${e.message}")
+            showPreviewError("Preview Error: ${e.message}")
         }
     }
 
+    // အသုံးမလိုတော့သော ပုံသေ Mockup function ကို ဖျက်မပစ်ဘဲ သာမန် Error Catch အတွက်ပဲ ချန်ထားပေးပါမည်
     private fun buildLoginScreenUI() {
-        try {
-            previewContainer.removeAllViews()
-            
-            val container = LinearLayout(this)
-            container.orientation = LinearLayout.VERTICAL
-            container.gravity = Gravity.CENTER
-            container.setPadding(32, 32, 32, 32)
-            container.setBackgroundColor(Color.parseColor("#1A1A2E"))
-            container.layoutParams = ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT
-            )
-            
-            val logo = TextView(this)
-            logo.text = "🤖"
-            logo.textSize = 72f
-            logo.gravity = Gravity.CENTER
-            container.addView(logo)
-            
-            val title = TextView(this)
-            title.text = "IT Expert AI"
-            title.textSize = 28f
-            title.setTextColor(Color.WHITE)
-            title.gravity = Gravity.CENTER
-            title.typeface = Typeface.DEFAULT_BOLD
-            container.addView(title)
-            
-            val subtitle = TextView(this)
-            subtitle.text = "Login to continue"
-            subtitle.textSize = 16f
-            subtitle.setTextColor(Color.parseColor("#A0A0C0"))
-            subtitle.gravity = Gravity.CENTER
-            container.addView(subtitle)
-            
-            val emailInput = EditText(this)
-            emailInput.hint = "Email"
-            emailInput.setTextColor(Color.WHITE)
-            emailInput.setHintTextColor(Color.parseColor("#666688"))
-            emailInput.setBackgroundResource(R.drawable.bg_input)
-            emailInput.setPadding(16, 16, 16, 16)
-            emailInput.layoutParams = LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-            )
-            container.addView(emailInput)
-            
-            val passwordInput = EditText(this)
-            passwordInput.hint = "Password"
-            passwordInput.setTextColor(Color.WHITE)
-            passwordInput.setHintTextColor(Color.parseColor("#666688"))
-            passwordInput.setBackgroundResource(R.drawable.bg_input)
-            passwordInput.setPadding(16, 16, 16, 16)
-            passwordInput.inputType = android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
-            passwordInput.layoutParams = LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-            )
-            container.addView(passwordInput)
-            
-            val loginBtn = Button(this)
-            loginBtn.text = "Login"
-            loginBtn.textSize = 18f
-            loginBtn.setTextColor(Color.WHITE)
-            loginBtn.setBackgroundResource(R.drawable.bg_send_button)
-            loginBtn.layoutParams = LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                130
-            )
-            loginBtn.setOnClickListener {
-                Toast.makeText(this, "🔐 Login clicked!", Toast.LENGTH_SHORT).show()
-            }
-            container.addView(loginBtn)
-            
-            val signup = TextView(this)
-            signup.text = "Don't have an account? Sign Up"
-            signup.textSize = 14f
-            signup.setTextColor(Color.parseColor("#A0A0C0"))
-            signup.gravity = Gravity.CENTER
-            container.addView(signup)
-            
-            previewContainer.addView(container)
-            
-            previewArea.visibility = View.VISIBLE
-            tvLiveStatus.text = "● Login Screen UI"
-            tvLiveStatus.setTextColor(Color.parseColor("#10A37F"))
-            
-        } catch (e: Exception) {
-            showPreviewError("UI Error: ${e.message}")
-        }
+        // ယခု စနစ်တွင် renderLayoutPreview မှ တိုက်ရိုက် Dynamic မောင်းနှင်သွားပါမည်။
     }
 
+    // ✅ ပြင်ဆင်ထားသော Floating PreviewDialog စနစ် (ကုဒ်အစစ်အတိုင်း Dialog ပေါ်တွင် ပုံဖော်ပေးမည်)
     private fun showFloatingPreview() {
-        val child = previewContainer.getChildAt(0)
-        if (child == null || child is TextView) {
+        if (currentParsedHtml.isEmpty()) {
+            Toast.makeText(this, "No preview available to pop out!", Toast.LENGTH_SHORT).show()
             return
         }
         
-        floatingPreviewDialog.setPreviewTitle("📱 Login Screen Preview")
-        floatingPreviewDialog.setPreviewContent(child)
+        // Floating Dialog အတွက် သီးသန့် WebView တစ်ခု တည်ဆောက်ခြင်း
+        val dialogWebView = WebView(this)
+        dialogWebView.settings.javaScriptEnabled = true
+        dialogWebView.settings.domStorageEnabled = true
+        dialogWebView.settings.loadWithOverviewMode = true
+        dialogWebView.settings.useWideViewPort = true
+        dialogWebView.webViewClient = WebViewClient()
+        
+        dialogWebView.loadDataWithBaseURL(null, currentParsedHtml, "text/html", "UTF-8", null)
+        
+        floatingPreviewDialog.setPreviewTitle("📱 Live App UI Dialog")
+        floatingPreviewDialog.setPreviewContent(dialogWebView) // Dialog ထဲသို့ WebView ကုဒ်အစစ် ထည့်လိုက်ခြင်း
         floatingPreviewDialog.show()
     }
 
@@ -624,7 +578,7 @@ class MainActivity : Activity() {
 
         btnCreateApiKey.setOnClickListener {
             val intent = android.content.Intent(android.content.Intent.ACTION_VIEW, 
-                android.net.Uri.parse("https://console.groq.com/keys"))
+                android.net.Uri.parse("[https://console.groq.com/keys](https://console.groq.com/keys)"))
             startActivity(intent)
             Toast.makeText(this, "🌐 Open Groq Console to create API Key", Toast.LENGTH_LONG).show()
         }
@@ -651,7 +605,7 @@ class MainActivity : Activity() {
             dialog.dismiss()
 
             chatContainer.removeAllViews()
-            addBotMessageUI("🚀 Groq API Key saved! Try: 'Create a login screen'")
+            addBotMessageUI("🚀 Groq API Key saved! Try: 'Create a login screen HTML'")
         }
 
         btnCancel.setOnClickListener {

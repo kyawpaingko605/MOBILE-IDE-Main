@@ -6,7 +6,6 @@
     android:orientation="horizontal"
     android:background="?android:colorBackground">
 
-    <!-- Side Menu -->
     <LinearLayout
         android:id="@+id/sideMenu"
         android:layout_width="0dp"
@@ -102,7 +101,6 @@
         </LinearLayout>
     </LinearLayout>
 
-    <!-- Main Content -->
     <LinearLayout
         android:id="@+id/mainContent"
         android:layout_width="match_parent"
@@ -110,7 +108,6 @@
         android:orientation="vertical"
         android:background="?android:colorBackground">
 
-        <!-- Top Bar -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="64dp"
@@ -162,7 +159,6 @@
                 android:textSize="18sp" />
         </LinearLayout>
 
-        <!-- Chat Area (Full Width) -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -222,7 +218,6 @@
             </LinearLayout>
         </LinearLayout>
 
-        <!-- Preview Area with WebView -->
         <LinearLayout
             android:id="@+id/previewArea"
             android:layout_width="match_parent"
@@ -232,7 +227,6 @@
             android:visibility="gone"
             android:elevation="8dp">
 
-            <!-- Preview Header -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -255,7 +249,7 @@
                     android:id="@+id/previewType"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="📱 Android"
+                    android:text="🌐 Web/HTML"
                     android:textColor="#F59E0B"
                     android:textSize="12sp"
                     android:background="#2D2D3D"
@@ -286,7 +280,6 @@
                     android:textSize="14sp" />
             </LinearLayout>
 
-            <!-- Preview Container -->
             <FrameLayout
                 android:id="@+id/previewContainer"
                 android:layout_width="match_parent"
@@ -299,9 +292,8 @@
                     android:id="@+id/webPreview"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="#1A1A2E" />
-
-            </FrameLayout>
+                    android:background="#1A1A2E"
+                    android:visibility="gone" /> </FrameLayout>
 
         </LinearLayout>
 

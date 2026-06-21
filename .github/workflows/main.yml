@@ -1,4 +1,4 @@
-name: Build and Unzip Tools
+name: Android CI Build
 
 on:
   push:
@@ -14,17 +14,35 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle
+
       - name: Create Assets Directory
         run: mkdir -p app/src/main/assets/bin_tools
 
       - name: Download Tools Zip
-        # -fL ထည့်ထားခြင်းဖြင့် Error ဖြစ်ရင် ချက်ချင်းရပ်သွားမည်ဖြစ်ပြီး Redirect လမ်းကြောင်းနောက်သို့ လိုက်ပါလိမ့်မည်
+        # ⚠️ အောက်က "YOUR_ACTUAL_ZIP_URL" နေရာမှာ သင့်ရဲ့ bin_tools.zip ရှိတဲ့ Link အစစ်အမှန်ကို သေချာလဲပေးပါ
         run: |
-          curl -fL -o tools.zip "YOUR_DOWNLOAD_URL"
-
-      - name: Debug Zip File (Optional)
-        # အကယ်၍ Error ထပ်တက်ပါက File အမျိုးအစား အစစ်အမှန်ကို စစ်ဆေးရန်
-        run: file tools.zip
+          curl -fL -o tools.zip "YOUR_ACTUAL_ZIP_URL"
 
       - name: Unzip Tools
         run: unzip tools.zip -d app/src/main/assets/bin_tools
+
+      - name: Remove Zip File (Cleanup)
+        run: rm tools.zip
+
+      - name: Grant Execute Permission for Gradlew
+        run: chmod +x ./gradlew
+
+      - name: Build with Gradle
+        run: ./gradlew assembleDebug
+
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: mobile-ide-debug-apk
+          path: app/build/outputs/apk/debug/*.apk

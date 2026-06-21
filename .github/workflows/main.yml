@@ -21,12 +21,15 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
-      # အရင် 'gradle assembleDebug' နေရာမှာ အောက်ပါအတိုင်း ပြောင်းသုံးပါ
-      - name: Build with Gradle
+      # အဆင့် ၁ - Gradle Version 8.5 ကို အရင်လှမ်းယူပတ်ဝန်းကျင်ပြင်ဆင်ပါ
+      - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
-          gradle-version: '8.5' # Gradle Version ကို 8.5 သို့ ပုံသေလျှော့ချသတ်မှတ်ခြင်း
-          arguments: assembleDebug
+          gradle-version: '8.5'
+
+      # အဆင့် ၂ - ရလာတဲ့ gradle နဲ့မှ တကယ့် Build ကို run ပါ
+      - name: Build with Gradle
+        run: gradle assembleDebug
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4

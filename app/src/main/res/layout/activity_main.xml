@@ -260,6 +260,17 @@
                     android:layout_marginEnd="8dp" />
 
                 <Button
+                    android:id="@+id/btnExportProject"
+                    android:layout_width="wrap_content"
+                    android:layout_height="32dp"
+                    android:background="@drawable/bg_send_button"
+                    android:text="📥 Export"
+                    android:textColor="#FFFFFF"
+                    android:textSize="12sp"
+                    android:paddingHorizontal="12dp"
+                    android:layout_marginEnd="4dp" />
+
+                <Button
                     android:id="@+id/btnFloatingPreview"
                     android:layout_width="wrap_content"
                     android:layout_height="32dp"

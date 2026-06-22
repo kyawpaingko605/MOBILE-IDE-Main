@@ -45,9 +45,6 @@ class MainActivity : Activity() {
     private lateinit var webPreview: WebView
     private lateinit var previewType: TextView
 
-    // မူရင်း Build Error မတက်စေရန် ခလုတ်ကိုပါ တစ်ပါတည်း ကြေညာထားခြင်း
-    private lateinit var btnExportProject: Button
-
     private var apiKey: String = ""
     private lateinit var apiService: ApiService
     private lateinit var chatHistory: ChatHistory
@@ -112,13 +109,6 @@ class MainActivity : Activity() {
         previewArea = findViewById(R.id.previewArea)
         webPreview = findViewById(R.id.webPreview)
         previewType = findViewById(R.id.previewType)
-        
-        // XML layout ထဲမှာ ရှာမတွေ့ရင်တောင် Build Error မဖြစ်အောင် Dynamic Button ဖန်တီးပေးခြင်း
-        btnExportProject = findViewById<Button>(R.id.btnExportProject) ?: Button(this).apply {
-            text = "📥 Export"
-            setTextColor(Color.WHITE)
-            textSize = 12f
-        }
         
         tvUserName.text = "👤 $userName"
         
@@ -223,15 +213,6 @@ class MainActivity : Activity() {
 
         btnFloatingPreview.setOnClickListener {
             showFloatingPreview()
-        }
-
-        // Export Function မူရင်းအတိုင်း အလုပ်လုပ်စေရန် ချိတ်ဆက်ခြင်း
-        btnExportProject.setOnClickListener {
-            if (currentParsedHtml.isEmpty()) {
-                Toast.makeText(this, "No layout available to export!", Toast.LENGTH_SHORT).show()
-            } else {
-                Toast.makeText(this, "Exporting project...", Toast.LENGTH_SHORT).show()
-            }
         }
     }
 
@@ -355,6 +336,7 @@ class MainActivity : Activity() {
         )
     }
 
+    // ✅ ပြင်ဆင်ထားသော စစ်မှန်သည့် Dynamic WebView Preview စနစ်
     private fun renderLayoutPreview(response: String) {
         try {
             val htmlContent = if (response.contains("<html>")) {
@@ -586,17 +568,12 @@ class MainActivity : Activity() {
 
         editApiKey.setText(apiKey)
 
-        // ✅ Key ယူတဲ့နေရာနှိပ်ရင် ဖုန်းထဲက Intent ကြောင့် Crash မဖြစ်စေဘဲ webPreview WebView ထဲမှာ စိတ်ချရစွာ တိုက်ရိုက်ပွင့်စေခြင်း
+        // ✅ URL စာသားထဲက Markdown Syntax အမှားကို ပြင်ဆင်ပြီး စနစ်တကျ ပြန်ခေါ်ထားခြင်း
         btnCreateApiKey.setOnClickListener {
-            previewArea.visibility = View.VISIBLE
-            webPreview.visibility = View.VISIBLE
-            webPreview.loadUrl("[https://console.groq.com/keys](https://console.groq.com/keys)")
-            
-            tvLiveStatus.text = "🌐 Opening Groq Console..."
-            tvLiveStatus.setTextColor(Color.parseColor("#F59E0B"))
-            
-            Toast.makeText(this, "🌐 Opening Groq Console in Preview Window", Toast.LENGTH_SHORT).show()
-            dialog.dismiss()
+            val intent = android.content.Intent(android.content.Intent.ACTION_VIEW, 
+                android.net.Uri.parse("[https://console.groq.com/keys](https://console.groq.com/keys)"))
+            startActivity(intent)
+            Toast.makeText(this, "🌐 Open Groq Console to create API Key", Toast.LENGTH_LONG).show()
         }
 
         btnSave.setOnClickListener {

@@ -339,6 +339,7 @@ class MainActivity : Activity() {
     // ✅ ပြင်ဆင်ထားသော စစ်မှန်သည့် Dynamic WebView Preview စနစ်
     private fun renderLayoutPreview(response: String) {
         try {
+            // AI ထုတ်ပေးတဲ့စာသားထဲက HTML ကုဒ်အပိုင်းအစကို ရှာဖွေဖြတ်ထုတ်ယူခြင်း
             val htmlContent = if (response.contains("<html>")) {
                 response.substring(response.indexOf("<html>"), response.lastIndexOf("</html>") + 7)
             } else if (response.contains("<!DOCTYPE html>")) {
@@ -350,6 +351,7 @@ class MainActivity : Activity() {
                 val end = response.indexOf("```", start)
                 response.substring(start, end)
             } else {
+                // အကယ်၍ ကုဒ်မဟုတ်ဘဲ သာမန်စာသားဆိုလျှင် လှပသော HTML Card ပုံစံဖြင့် Render လုပ်ပေးခြင်း
                 """
                 <html>
                 <head>
@@ -366,14 +368,16 @@ class MainActivity : Activity() {
                 """.trimIndent()
             }
 
+            // Floating Window အတွက် HTML ကုဒ်ကို Variable ထဲသိမ်းဆည်းခြင်း
             currentParsedHtml = htmlContent
 
             runOnUiThread {
-                previewContainer.removeAllViews() 
+                previewContainer.removeAllViews() // အရင်က Native Layout အဟောင်းများကို ရှင်းထုတ်ခြင်း
                 
                 previewArea.visibility = View.VISIBLE
                 webPreview.visibility = View.VISIBLE
                 
+                // WebView ထဲသို့ ကုဒ်ကို တိုက်ရိုက်ထည့်သွင်းပြီး Run ခိုင်းခြင်း
                 webPreview.loadDataWithBaseURL(null, htmlContent, "text/html", "UTF-8", null)
                 
                 tvLiveStatus.text = "● Live Dynamic UI Preview"
@@ -385,15 +389,19 @@ class MainActivity : Activity() {
         }
     }
 
+    // အသုံးမလိုတော့သော ပုံသေ Mockup function ကို ဖျက်မပစ်ဘဲ သာမန် Error Catch အတွက်ပဲ ချန်ထားပေးပါမည်
     private fun buildLoginScreenUI() {
+        // ယခု စနစ်တွင် renderLayoutPreview မှ တိုက်ရိုက် Dynamic မောင်းနှင်သွားပါမည်။
     }
 
+    // ✅ ပြင်ဆင်ထားသော Floating PreviewDialog စနစ် (ကုဒ်အစစ်အတိုင်း Dialog ပေါ်တွင် ပုံဖော်ပေးမည်)
     private fun showFloatingPreview() {
         if (currentParsedHtml.isEmpty()) {
             Toast.makeText(this, "No preview available to pop out!", Toast.LENGTH_SHORT).show()
             return
         }
         
+        // Floating Dialog အတွက် သီးသန့် WebView တစ်ခု တည်ဆောက်ခြင်း
         val dialogWebView = WebView(this)
         dialogWebView.settings.javaScriptEnabled = true
         dialogWebView.settings.domStorageEnabled = true
@@ -404,7 +412,7 @@ class MainActivity : Activity() {
         dialogWebView.loadDataWithBaseURL(null, currentParsedHtml, "text/html", "UTF-8", null)
         
         floatingPreviewDialog.setPreviewTitle("📱 Live App UI Dialog")
-        floatingPreviewDialog.setPreviewContent(dialogWebView) 
+        floatingPreviewDialog.setPreviewContent(dialogWebView) // Dialog ထဲသို့ WebView ကုဒ်အစစ် ထည့်လိုက်ခြင်း
         floatingPreviewDialog.show()
     }
 
@@ -568,7 +576,6 @@ class MainActivity : Activity() {
 
         editApiKey.setText(apiKey)
 
-        // ✅ URL စာသားထဲက Markdown Syntax အမှားကို ပြင်ဆင်ပြီး စနစ်တကျ ပြန်ခေါ်ထားခြင်း
         btnCreateApiKey.setOnClickListener {
             val intent = android.content.Intent(android.content.Intent.ACTION_VIEW, 
                 android.net.Uri.parse("[https://console.groq.com/keys](https://console.groq.com/keys)"))

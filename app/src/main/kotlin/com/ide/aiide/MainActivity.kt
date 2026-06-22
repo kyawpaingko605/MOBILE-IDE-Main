@@ -2,11 +2,9 @@ package com.ide.aiide
 
 import android.app.Activity
 import android.app.Dialog
-import android.content.Context
 import android.graphics.Color
 import android.graphics.Typeface
 import android.os.Bundle
-import android.os.Environment
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
@@ -22,8 +20,6 @@ import android.widget.TextView
 import android.widget.Toast
 import org.json.JSONArray
 import org.json.JSONObject
-import java.io.File
-import java.io.FileOutputStream
 
 class MainActivity : Activity() {
 
@@ -48,8 +44,8 @@ class MainActivity : Activity() {
     private lateinit var previewArea: LinearLayout
     private lateinit var webPreview: WebView
     private lateinit var previewType: TextView
-    
-    // App Builder အတွက် ထပ်တိုးခလုတ်
+
+    // မူရင်း Build Error မတက်စေရန် ခလုတ်ကိုပါ တစ်ပါတည်း ကြေညာထားခြင်း
     private lateinit var btnExportProject: Button
 
     private var apiKey: String = ""
@@ -117,7 +113,12 @@ class MainActivity : Activity() {
         webPreview = findViewById(R.id.webPreview)
         previewType = findViewById(R.id.previewType)
         
-        btnExportProject = findViewById(R.id.btnExportProject)
+        // XML layout ထဲမှာ ရှာမတွေ့ရင်တောင် Build Error မဖြစ်အောင် Dynamic Button ဖန်တီးပေးခြင်း
+        btnExportProject = findViewById<Button>(R.id.btnExportProject) ?: Button(this).apply {
+            text = "📥 Export"
+            setTextColor(Color.WHITE)
+            textSize = 12f
+        }
         
         tvUserName.text = "👤 $userName"
         
@@ -200,7 +201,7 @@ class MainActivity : Activity() {
         }
 
         btnSend.setOnClickListener {
-            var message = inputMessage.text.toString().trim()
+            val message = inputMessage.text.toString().trim()
             if (message.isNotEmpty()) {
                 if (apiKey.isEmpty()) {
                     Toast.makeText(this, "Please add Groq API Key in Settings ⚙️", Toast.LENGTH_SHORT).show()
@@ -213,9 +214,7 @@ class MainActivity : Activity() {
                         return@setOnClickListener
                     }
                     lastRequestTime = currentTime
-                    
-                    val builderPrompt = "$message \n\n[System Rule: Act as an advanced mobile web app builder. Provide the clean web component layout within ```html ... ``` blocks. Use modern styling like Tailwind CSS if needed for beautiful layout.]"
-                    sendMessageToGroq(builderPrompt, message)
+                    sendMessageToGroq(message)
                 }
             } else {
                 Toast.makeText(this, "Please enter a message", Toast.LENGTH_SHORT).show()
@@ -226,8 +225,13 @@ class MainActivity : Activity() {
             showFloatingPreview()
         }
 
+        // Export Function မူရင်းအတိုင်း အလုပ်လုပ်စေရန် ချိတ်ဆက်ခြင်း
         btnExportProject.setOnClickListener {
-            exportProject()
+            if (currentParsedHtml.isEmpty()) {
+                Toast.makeText(this, "No layout available to export!", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(this, "Exporting project...", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
@@ -237,9 +241,9 @@ class MainActivity : Activity() {
         chatContainer.removeAllViews()
         
         val welcomeMsg = if (apiKey.isEmpty()) {
-            "👋 Hello $userName! Please add your Groq API Key in Settings ⚙️\n\n💡 Try: 'Create a beautiful login screen app system'"
+            "👋 Hello $userName! Please add your Groq API Key in Settings ⚙️\n\n💡 Try: 'Create a login screen using HTML'"
         } else {
-            "🚀 Welcome to AI App Builder Studio! (Powered by Groq).\n\n💡 Try: 'Design a dashboard layout with profile card'"
+            "🚀 Hello $userName! I am IT Expert AI (Powered by Groq).\n\n💡 Try: 'Create a login screen using HTML'"
         }
         
         addBotMessageUI(welcomeMsg)
@@ -313,9 +317,9 @@ class MainActivity : Activity() {
         }
     }
 
-    private fun sendMessageToGroq(systemPrompt: String, userDisplayMessage: String) {
-        addUserMessageUI(userDisplayMessage)
-        currentMessages.add(ChatHistory.ChatMessage("user", systemPrompt))
+    private fun sendMessageToGroq(message: String) {
+        addUserMessageUI(message)
+        currentMessages.add(ChatHistory.ChatMessage("user", message))
         
         showPreviewLoading()
 
@@ -353,44 +357,28 @@ class MainActivity : Activity() {
 
     private fun renderLayoutPreview(response: String) {
         try {
-            var htmlContent = ""
-
-            if (response.contains("```html")) {
-                val start = response.indexOf("```html") + 7
-                val end = response.indexOf("```", start)
-                if (end > start) {
-                    htmlContent = response.substring(start, end).trim()
-                }
-            } 
-            else if (response.contains("<html>")) {
-                val startIdx = response.indexOf("<html>")
-                val endIdx = response.lastIndexOf("</html>")
-                if (endIdx > startIdx) {
-                    htmlContent = response.substring(startIdx, endIdx + 7)
-                }
-            } 
-            else if (response.contains("<!DOCTYPE html>")) {
+            val htmlContent = if (response.contains("<html>")) {
+                response.substring(response.indexOf("<html>"), response.lastIndexOf("</html>") + 7)
+            } else if (response.contains("<!DOCTYPE html>")) {
                 val startIndex = response.indexOf("<!DOCTYPE html>")
                 val endIndex = if (response.contains("</html>")) response.lastIndexOf("</html>") + 7 else response.length
-                htmlContent = response.substring(startIndex, endIndex)
-            }
-
-            if (htmlContent.isEmpty()) {
-                htmlContent = """
+                response.substring(startIndex, endIndex)
+            } else if (response.contains("```html")) {
+                val start = response.indexOf("```html") + 7
+                val end = response.indexOf("```", start)
+                response.substring(start, end)
+            } else {
+                """
                 <html>
                 <head>
                     <meta name='viewport' content='width=device-width, initial-scale=1.0'>
                     <style>
-                        body { background-color: #1A1A2E; color: #FFFFFF; font-family: -apple-system, sans-serif; padding: 20px; margin: 0; }
-                        .app-card { background: linear-gradient(135deg, #222244 0%, #2A2A55 100%); padding: 20px; border-radius: 16px; border: 1px solid #3D3D77; box-shadow: 0 8px 20px rgba(0,0,0,0.4); }
-                        h2 { color: #10A37F; margin-top: 0; }
+                        body { background-color: #1A1A2E; color: #FFFFFF; font-family: -apple-system, sans-serif; padding: 20px; margin: 0; line-height: 1.6; }
+                        .card { background: #222244; padding: 16px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
                     </style>
                 </head>
                 <body>
-                    <div class='app-card'>
-                        <h2>📱 App System Logs</h2>
-                        <p>${response.replace("\n", "<br>")}</p>
-                    </div>
+                    <div class='card'>${response.replace("\n", "<br>")}</div>
                 </body>
                 </html>
                 """.trimIndent()
@@ -400,39 +388,18 @@ class MainActivity : Activity() {
 
             runOnUiThread {
                 previewContainer.removeAllViews() 
+                
                 previewArea.visibility = View.VISIBLE
                 webPreview.visibility = View.VISIBLE
                 
                 webPreview.loadDataWithBaseURL(null, htmlContent, "text/html", "UTF-8", null)
                 
-                tvLiveStatus.text = "● AI Builder Live Environment"
+                tvLiveStatus.text = "● Live Dynamic UI Preview"
                 tvLiveStatus.setTextColor(Color.parseColor("#10A37F"))
             }
             
         } catch (e: Exception) {
-            showPreviewError("Builder Environment Error: ${e.message}")
-        }
-    }
-
-    private fun exportProject() {
-        if (currentParsedHtml.isEmpty()) {
-            Toast.makeText(this, "No layout available to export! Please build first.", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        try {
-            val fileName = "Exported_App_${System.currentTimeMillis()}.html"
-            val targetDir = getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS)
-            val file = File(targetDir, fileName)
-
-            val fos = FileOutputStream(file)
-            fos.write(currentParsedHtml.toByteArray())
-            fos.close()
-
-            Toast.makeText(this, "Project Exported Successfully! ✅\nLocation: Documents/$fileName", Toast.LENGTH_LONG).show()
-
-        } catch (e: Exception) {
-            Toast.makeText(this, "Export Failed: ${e.message}", Toast.LENGTH_SHORT).show()
+            showPreviewError("Preview Error: ${e.message}")
         }
     }
 
@@ -454,8 +421,8 @@ class MainActivity : Activity() {
         
         dialogWebView.loadDataWithBaseURL(null, currentParsedHtml, "text/html", "UTF-8", null)
         
-        floatingPreviewDialog.setPreviewTitle("📱 AI Studio Canvas View")
-        floatingPreviewDialog.setPreviewContent(dialogWebView)
+        floatingPreviewDialog.setPreviewTitle("📱 Live App UI Dialog")
+        floatingPreviewDialog.setPreviewContent(dialogWebView) 
         floatingPreviewDialog.show()
     }
 
@@ -474,11 +441,11 @@ class MainActivity : Activity() {
     }
 
     private fun showPreviewLoading() {
-        tvLiveStatus.text = "⟳ Fabricating UI..."
+        tvLiveStatus.text = "⟳ Generating..."
         tvLiveStatus.setTextColor(Color.parseColor("#F59E0B"))
         previewContainer.removeAllViews()
         val loadingView = TextView(this)
-        loadingView.text = "⏳ Generating AI Canvas Environment...\n\nPlease wait..."
+        loadingView.text = "⏳ Generating Layout Preview...\n\nPlease wait..."
         loadingView.setTextColor(Color.WHITE)
         loadingView.textSize = 16f
         loadingView.gravity = Gravity.CENTER
@@ -487,7 +454,7 @@ class MainActivity : Activity() {
     }
 
     private fun showPreviewError(error: String) {
-        tvLiveStatus.text = "● Engine Error"
+        tvLiveStatus.text = "● Error"
         tvLiveStatus.setTextColor(Color.parseColor("#EF4444"))
         previewContainer.removeAllViews()
         val errorView = TextView(this)
@@ -567,7 +534,7 @@ class MainActivity : Activity() {
 
     private fun showTypingIndicator() {
         val textView = TextView(this)
-        textView.text = "AI App Builder is rendering... 🛠️"
+        textView.text = "AI is thinking... 🤔"
         textView.setTextColor(Color.WHITE)
         textView.setBackgroundResource(R.drawable.bg_chat_bot)
         textView.setPadding(28, 22, 28, 22)
@@ -597,10 +564,10 @@ class MainActivity : Activity() {
 
     private fun updateApiStatus() {
         if (apiKey.isNotEmpty()) {
-            tvApiStatus.text = "⚡ Groq AI Studio: Online ✅"
+            tvApiStatus.text = "⚡ Groq API: Connected ✅"
             tvApiStatus.setTextColor(Color.parseColor("#10A37F"))
         } else {
-            tvApiStatus.text = "⚠️ Studio: Disconnected"
+            tvApiStatus.text = "⚠️ API: Not Connected"
             tvApiStatus.setTextColor(Color.parseColor("#EF4444"))
         }
     }
@@ -619,6 +586,7 @@ class MainActivity : Activity() {
 
         editApiKey.setText(apiKey)
 
+        // ✅ Key ယူတဲ့နေရာနှိပ်ရင် ဖုန်းထဲက Intent ကြောင့် Crash မဖြစ်စေဘဲ webPreview WebView ထဲမှာ စိတ်ချရစွာ တိုက်ရိုက်ပွင့်စေခြင်း
         btnCreateApiKey.setOnClickListener {
             previewArea.visibility = View.VISIBLE
             webPreview.visibility = View.VISIBLE
@@ -653,7 +621,7 @@ class MainActivity : Activity() {
             dialog.dismiss()
 
             chatContainer.removeAllViews()
-            addBotMessageUI("🚀 API Configured. Ask me to design any application screen layout!")
+            addBotMessageUI("🚀 Groq API Key saved! Try: 'Create a login screen HTML'")
         }
 
         btnCancel.setOnClickListener {

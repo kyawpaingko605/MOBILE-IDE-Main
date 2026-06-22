@@ -336,23 +336,37 @@ class MainActivity : Activity() {
         )
     }
 
-    // ✅ ပြင်ဆင်ထားသော စစ်မှန်သည့် Dynamic WebView Preview စနစ်
+    // ✅ ပြင်ဆင်ထားသော ပိုမိုတိကျသည့် Dynamic WebView Preview စနစ်
     private fun renderLayoutPreview(response: String) {
         try {
-            // AI ထုတ်ပေးတဲ့စာသားထဲက HTML ကုဒ်အပိုင်းအစကို ရှာဖွေဖြတ်ထုတ်ယူခြင်း
-            val htmlContent = if (response.contains("<html>")) {
-                response.substring(response.indexOf("<html>"), response.lastIndexOf("</html>") + 7)
-            } else if (response.contains("<!DOCTYPE html>")) {
-                val startIndex = response.indexOf("<!DOCTYPE html>")
-                val endIndex = if (response.contains("</html>")) response.lastIndexOf("</html>") + 7 else response.length
-                response.substring(startIndex, endIndex)
-            } else if (response.contains("```html")) {
+            var htmlContent = ""
+
+            // ၁။ Markdown ```html ... ``` ပါလာလျှင် ၎င်းကြားထဲက HTML ကို အရင်ဆွဲထုတ်မည်
+            if (response.contains("```html")) {
                 val start = response.indexOf("```html") + 7
                 val end = response.indexOf("```", start)
-                response.substring(start, end)
-            } else {
-                // အကယ်၍ ကုဒ်မဟုတ်ဘဲ သာမန်စာသားဆိုလျှင် လှပသော HTML Card ပုံစံဖြင့် Render လုပ်ပေးခြင်း
-                """
+                if (end > start) {
+                    htmlContent = response.substring(start, end).trim()
+                }
+            } 
+            // ၂။ အကယ်၍ ```html မပါဘဲ <html> tag တိုက်ရိုက်ပါလာလျှင်
+            else if (response.contains("<html>")) {
+                val startIdx = response.indexOf("<html>")
+                val endIdx = response.lastIndexOf("</html>")
+                if (endIdx > startIdx) {
+                    htmlContent = response.substring(startIdx, endIdx + 7)
+                }
+            } 
+            // ၃။ <!DOCTYPE html> ဖြင့် စတင်လာလျှင်
+            else if (response.contains("<!DOCTYPE html>")) {
+                val startIndex = response.indexOf("<!DOCTYPE html>")
+                val endIndex = if (response.contains("</html>")) response.lastIndexOf("</html>") + 7 else response.length
+                htmlContent = response.substring(startIndex, endIndex)
+            }
+
+            // ၄။ အထက်ပါအချက်များနှင့် ကိုက်ညီမှုမရှိဘဲ သာမန်စာသားဖြစ်နေလျှင် Layout ကတ်ပြားပုံစံ ပြုလုပ်မည်
+            if (htmlContent.isEmpty()) {
+                htmlContent = """
                 <html>
                 <head>
                     <meta name='viewport' content='width=device-width, initial-scale=1.0'>
@@ -389,7 +403,6 @@ class MainActivity : Activity() {
         }
     }
 
-    // အသုံးမလိုတော့သော ပုံသေ Mockup function ကို ဖျက်မပစ်ဘဲ သာမန် Error Catch အတွက်ပဲ ချန်ထားပေးပါမည်
     private fun buildLoginScreenUI() {
         // ယခု စနစ်တွင် renderLayoutPreview မှ တိုက်ရိုက် Dynamic မောင်းနှင်သွားပါမည်။
     }
@@ -578,7 +591,7 @@ class MainActivity : Activity() {
 
         btnCreateApiKey.setOnClickListener {
             val intent = android.content.Intent(android.content.Intent.ACTION_VIEW, 
-                android.net.Uri.parse("[https://console.groq.com/keys](https://console.groq.com/keys)"))
+                android.net.Uri.parse("https://console.groq.com/keys"))
             startActivity(intent)
             Toast.makeText(this, "🌐 Open Groq Console to create API Key", Toast.LENGTH_LONG).show()
         }

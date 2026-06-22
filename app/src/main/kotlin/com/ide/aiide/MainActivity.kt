@@ -2,9 +2,11 @@ package com.ide.aiide
 
 import android.app.Activity
 import android.app.Dialog
+import android.content.Context
 import android.graphics.Color
 import android.graphics.Typeface
 import android.os.Bundle
+import android.os.Environment
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
@@ -20,6 +22,8 @@ import android.widget.TextView
 import android.widget.Toast
 import org.json.JSONArray
 import org.json.JSONObject
+import java.io.File
+import java.io.FileOutputStream
 
 class MainActivity : Activity() {
 
@@ -44,6 +48,9 @@ class MainActivity : Activity() {
     private lateinit var previewArea: LinearLayout
     private lateinit var webPreview: WebView
     private lateinit var previewType: TextView
+    
+    // App Builder အတွက် ထပ်တိုးခလုတ်
+    private lateinit var btnExportProject: Button
 
     private var apiKey: String = ""
     private lateinit var apiService: ApiService
@@ -109,6 +116,9 @@ class MainActivity : Activity() {
         previewArea = findViewById(R.id.previewArea)
         webPreview = findViewById(R.id.webPreview)
         previewType = findViewById(R.id.previewType)
+        
+        // XML layout ထဲမှာ ID: btnExportProject ဆိုပြီး Button တစ်ခု ထပ်တိုးပေးရပါမယ်
+        btnExportProject = findViewById(R.id.btnExportProject)
         
         tvUserName.text = "👤 $userName"
         
@@ -191,7 +201,7 @@ class MainActivity : Activity() {
         }
 
         btnSend.setOnClickListener {
-            val message = inputMessage.text.toString().trim()
+            var message = inputMessage.text.toString().trim()
             if (message.isNotEmpty()) {
                 if (apiKey.isEmpty()) {
                     Toast.makeText(this, "Please add Groq API Key in Settings ⚙️", Toast.LENGTH_SHORT).show()
@@ -204,7 +214,10 @@ class MainActivity : Activity() {
                         return@setOnClickListener
                     }
                     lastRequestTime = currentTime
-                    sendMessageToGroq(message)
+                    
+                    // AI ဆီကနေ သန့်စင်ပြီးသား App Component Code တွေရရှိဖို့ Prompt ကို စနစ်တကျ ပြောင်းလဲပေးခြင်း
+                    val builderPrompt = "$message \n\n[System Rule: Act as an advanced mobile web app builder. Provide the clean web component layout within ```html ... ``` blocks. Use modern styling like Tailwind CSS if needed for beautiful layout.]"
+                    sendMessageToGroq(builderPrompt, message)
                 }
             } else {
                 Toast.makeText(this, "Please enter a message", Toast.LENGTH_SHORT).show()
@@ -214,6 +227,10 @@ class MainActivity : Activity() {
         btnFloatingPreview.setOnClickListener {
             showFloatingPreview()
         }
+
+        btnExportProject.setOnClickListener {
+            exportProject()
+        }
     }
 
     private fun createNewSession() {
@@ -222,9 +239,9 @@ class MainActivity : Activity() {
         chatContainer.removeAllViews()
         
         val welcomeMsg = if (apiKey.isEmpty()) {
-            "👋 Hello $userName! Please add your Groq API Key in Settings ⚙️\n\n💡 Try: 'Create a login screen using HTML'"
+            "👋 Hello $userName! Please add your Groq API Key in Settings ⚙️\n\n💡 Try: 'Create a beautiful login screen app system'"
         } else {
-            "🚀 Hello $userName! I am IT Expert AI (Powered by Groq).\n\n💡 Try: 'Create a login screen using HTML'"
+            "🚀 Welcome to AI App Builder Studio! (Powered by Groq).\n\n💡 Try: 'Design a dashboard layout with profile card'"
         }
         
         addBotMessageUI(welcomeMsg)
@@ -298,9 +315,9 @@ class MainActivity : Activity() {
         }
     }
 
-    private fun sendMessageToGroq(message: String) {
-        addUserMessageUI(message)
-        currentMessages.add(ChatHistory.ChatMessage("user", message))
+    private fun sendMessageToGroq(systemPrompt: String, userDisplayMessage: String) {
+        addUserMessageUI(userDisplayMessage)
+        currentMessages.add(ChatHistory.ChatMessage("user", systemPrompt))
         
         showPreviewLoading()
 
@@ -336,12 +353,12 @@ class MainActivity : Activity() {
         )
     }
 
-    // ✅ ပြင်ဆင်ထားသော ပိုမိုတိကျသည့် Dynamic WebView Preview စနစ်
+    // ✅ ပိုမိုတိကျပြီး အမှားနည်းပါးသော Dynamic App Preview Engine 
     private fun renderLayoutPreview(response: String) {
         try {
             var htmlContent = ""
 
-            // ၁။ Markdown ```html ... ``` ပါလာလျှင် ၎င်းကြားထဲက HTML ကို အရင်ဆွဲထုတ်မည်
+            // ၁။ Markdown ```html ... ``` ပါလာလျှင် ၎င်းကြားထဲက HTML ကို ဖြတ်ထုတ်မည်
             if (response.contains("```html")) {
                 val start = response.indexOf("```html") + 7
                 val end = response.indexOf("```", start)
@@ -349,7 +366,7 @@ class MainActivity : Activity() {
                     htmlContent = response.substring(start, end).trim()
                 }
             } 
-            // ၂။ အကယ်၍ ```html မပါဘဲ <html> tag တိုက်ရိုက်ပါလာလျှင်
+            // ၂။ HTML tags ပါဝင်မှု ရှိမရှိ ထပ်မံစစ်ဆေးခြင်း
             else if (response.contains("<html>")) {
                 val startIdx = response.indexOf("<html>")
                 val endIdx = response.lastIndexOf("</html>")
@@ -357,64 +374,89 @@ class MainActivity : Activity() {
                     htmlContent = response.substring(startIdx, endIdx + 7)
                 }
             } 
-            // ၃။ <!DOCTYPE html> ဖြင့် စတင်လာလျှင်
+            // ၃။ <!DOCTYPE html> စနစ်ကို စစ်ဆေးခြင်း
             else if (response.contains("<!DOCTYPE html>")) {
                 val startIndex = response.indexOf("<!DOCTYPE html>")
                 val endIndex = if (response.contains("</html>")) response.lastIndexOf("</html>") + 7 else response.length
                 htmlContent = response.substring(startIndex, endIndex)
             }
 
-            // ၄။ အထက်ပါအချက်များနှင့် ကိုက်ညီမှုမရှိဘဲ သာမန်စာသားဖြစ်နေလျှင် Layout ကတ်ပြားပုံစံ ပြုလုပ်မည်
+            // ၄။ အကယ်၍ သာမန်စာသားသက်သက် ဖြစ်နေလျှင် App Builder Dashboard Card အဖြစ် Render လုပ်ပေးခြင်း
             if (htmlContent.isEmpty()) {
                 htmlContent = """
                 <html>
                 <head>
                     <meta name='viewport' content='width=device-width, initial-scale=1.0'>
                     <style>
-                        body { background-color: #1A1A2E; color: #FFFFFF; font-family: -apple-system, sans-serif; padding: 20px; margin: 0; line-height: 1.6; }
-                        .card { background: #222244; padding: 16px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+                        body { background-color: #1A1A2E; color: #FFFFFF; font-family: -apple-system, sans-serif; padding: 20px; margin: 0; }
+                        .app-card { background: linear-gradient(135deg, #222244 0%, #2A2A55 100%); padding: 20px; border-radius: 16px; border: 1px solid #3D3D77; box-shadow: 0 8px 20px rgba(0,0,0,0.4); }
+                        h2 { color: #10A37F; margin-top: 0; }
                     </style>
                 </head>
                 <body>
-                    <div class='card'>${response.replace("\n", "<br>")}</div>
+                    <div class='app-card'>
+                        <h2>📱 App System Logs</h2>
+                        <p>${response.replace("\n", "<br>")}</p>
+                    </div>
                 </body>
                 </html>
                 """.trimIndent()
             }
 
-            // Floating Window အတွက် HTML ကုဒ်ကို Variable ထဲသိမ်းဆည်းခြင်း
             currentParsedHtml = htmlContent
 
             runOnUiThread {
-                previewContainer.removeAllViews() // အရင်က Native Layout အဟောင်းများကို ရှင်းထုတ်ခြင်း
-                
+                previewContainer.removeAllViews() 
                 previewArea.visibility = View.VISIBLE
                 webPreview.visibility = View.VISIBLE
                 
-                // WebView ထဲသို့ ကုဒ်ကို တိုက်ရိုက်ထည့်သွင်းပြီး Run ခိုင်းခြင်း
+                // WebView သို့ Component UI ပို့လွှတ်မောင်းနှင်ခြင်း
                 webPreview.loadDataWithBaseURL(null, htmlContent, "text/html", "UTF-8", null)
                 
-                tvLiveStatus.text = "● Live Dynamic UI Preview"
+                tvLiveStatus.text = "● AI Builder Live Environment"
                 tvLiveStatus.setTextColor(Color.parseColor("#10A37F"))
             }
             
         } catch (e: Exception) {
-            showPreviewError("Preview Error: ${e.message}")
+            showPreviewError("Builder Environment Error: ${e.message}")
+        }
+    }
+
+    // ✅ ဆောက်လုပ်ထားသော Web UI အား ဖုန်းသိုလှောင်မှုထဲသို .html ဖိုင်အဖြစ် ထုတ်ယူသိမ်းဆည်းပေးမည့် Export စနစ်
+    private fun exportProject() {
+        if (currentParsedHtml.isEmpty()) {
+            Toast.makeText(this, "No layout available to export! Please build first.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        try {
+            val fileName = "Exported_App_${System.currentTimeMillis()}.html"
+            
+            // App-specific internal standard document directory တွင် သိမ်းဆည်းခြင်း
+            val targetDir = getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS)
+            val file = File(targetDir, fileName)
+
+            val fos = FileOutputStream(file)
+            fos.write(currentParsedHtml.toByteArray())
+            fos.close()
+
+            Toast.makeText(this, "Project Exported Successfully! ✅\nLocation: Documents/$fileName", Toast.LENGTH_LONG).show()
+
+        } catch (e: Exception) {
+            Toast.makeText(this, "Export Failed: ${e.message}", Toast.LENGTH_SHORT).show()
         }
     }
 
     private fun buildLoginScreenUI() {
-        // ယခု စနစ်တွင် renderLayoutPreview မှ တိုက်ရိုက် Dynamic မောင်းနှင်သွားပါမည်။
+        // Dynamic Parser စနစ်ဖြင့် အစားထိုးထားပါသည်
     }
 
-    // ✅ ပြင်ဆင်ထားသော Floating PreviewDialog စနစ် (ကုဒ်အစစ်အတိုင်း Dialog ပေါ်တွင် ပုံဖော်ပေးမည်)
     private fun showFloatingPreview() {
         if (currentParsedHtml.isEmpty()) {
             Toast.makeText(this, "No preview available to pop out!", Toast.LENGTH_SHORT).show()
             return
         }
         
-        // Floating Dialog အတွက် သီးသန့် WebView တစ်ခု တည်ဆောက်ခြင်း
         val dialogWebView = WebView(this)
         dialogWebView.settings.javaScriptEnabled = true
         dialogWebView.settings.domStorageEnabled = true
@@ -424,8 +466,8 @@ class MainActivity : Activity() {
         
         dialogWebView.loadDataWithBaseURL(null, currentParsedHtml, "text/html", "UTF-8", null)
         
-        floatingPreviewDialog.setPreviewTitle("📱 Live App UI Dialog")
-        floatingPreviewDialog.setPreviewContent(dialogWebView) // Dialog ထဲသို့ WebView ကုဒ်အစစ် ထည့်လိုက်ခြင်း
+        floatingPreviewDialog.setPreviewTitle("📱 AI Studio Canvas View")
+        floatingPreviewDialog.setPreviewContent(dialogWebView)
         floatingPreviewDialog.show()
     }
 
@@ -444,11 +486,11 @@ class MainActivity : Activity() {
     }
 
     private fun showPreviewLoading() {
-        tvLiveStatus.text = "⟳ Generating..."
+        tvLiveStatus.text = "⟳ Fabricating UI..."
         tvLiveStatus.setTextColor(Color.parseColor("#F59E0B"))
         previewContainer.removeAllViews()
         val loadingView = TextView(this)
-        loadingView.text = "⏳ Generating Layout Preview...\n\nPlease wait..."
+        loadingView.text = "⏳ Generating AI Canvas Environment...\n\nPlease wait..."
         loadingView.setTextColor(Color.WHITE)
         loadingView.textSize = 16f
         loadingView.gravity = Gravity.CENTER
@@ -457,7 +499,7 @@ class MainActivity : Activity() {
     }
 
     private fun showPreviewError(error: String) {
-        tvLiveStatus.text = "● Error"
+        tvLiveStatus.text = "● Engine Error"
         tvLiveStatus.setTextColor(Color.parseColor("#EF4444"))
         previewContainer.removeAllViews()
         val errorView = TextView(this)
@@ -537,7 +579,7 @@ class MainActivity : Activity() {
 
     private fun showTypingIndicator() {
         val textView = TextView(this)
-        textView.text = "AI is thinking... 🤔"
+        textView.text = "AI App Builder is rendering... 🛠️"
         textView.setTextColor(Color.WHITE)
         textView.setBackgroundResource(R.drawable.bg_chat_bot)
         textView.setPadding(28, 22, 28, 22)
@@ -567,10 +609,10 @@ class MainActivity : Activity() {
 
     private fun updateApiStatus() {
         if (apiKey.isNotEmpty()) {
-            tvApiStatus.text = "⚡ Groq API: Connected ✅"
+            tvApiStatus.text = "⚡ Groq AI Studio: Online ✅"
             tvApiStatus.setTextColor(Color.parseColor("#10A37F"))
         } else {
-            tvApiStatus.text = "⚠️ API: Not Connected"
+            tvApiStatus.text = "⚠️ Studio: Disconnected"
             tvApiStatus.setTextColor(Color.parseColor("#EF4444"))
         }
     }
@@ -591,7 +633,7 @@ class MainActivity : Activity() {
 
         btnCreateApiKey.setOnClickListener {
             val intent = android.content.Intent(android.content.Intent.ACTION_VIEW, 
-                android.net.Uri.parse("https://console.groq.com/keys"))
+                android.net.Uri.parse("[https://console.groq.com/keys](https://console.groq.com/keys)"))
             startActivity(intent)
             Toast.makeText(this, "🌐 Open Groq Console to create API Key", Toast.LENGTH_LONG).show()
         }
@@ -618,7 +660,7 @@ class MainActivity : Activity() {
             dialog.dismiss()
 
             chatContainer.removeAllViews()
-            addBotMessageUI("🚀 Groq API Key saved! Try: 'Create a login screen HTML'")
+            addBotMessageUI("🚀 API Configured. Ask me to design any application screen layout!")
         }
 
         btnCancel.setOnClickListener {

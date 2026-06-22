@@ -117,7 +117,6 @@ class MainActivity : Activity() {
         webPreview = findViewById(R.id.webPreview)
         previewType = findViewById(R.id.previewType)
         
-        // XML layout ထဲမှာ ID: btnExportProject ဆိုပြီး Button တစ်ခု ထပ်တိုးပေးရပါမယ်
         btnExportProject = findViewById(R.id.btnExportProject)
         
         tvUserName.text = "👤 $userName"
@@ -215,7 +214,6 @@ class MainActivity : Activity() {
                     }
                     lastRequestTime = currentTime
                     
-                    // AI ဆီကနေ သန့်စင်ပြီးသား App Component Code တွေရရှိဖို့ Prompt ကို စနစ်တကျ ပြောင်းလဲပေးခြင်း
                     val builderPrompt = "$message \n\n[System Rule: Act as an advanced mobile web app builder. Provide the clean web component layout within ```html ... ``` blocks. Use modern styling like Tailwind CSS if needed for beautiful layout.]"
                     sendMessageToGroq(builderPrompt, message)
                 }
@@ -353,12 +351,10 @@ class MainActivity : Activity() {
         )
     }
 
-    // ✅ ပိုမိုတိကျပြီး အမှားနည်းပါးသော Dynamic App Preview Engine 
     private fun renderLayoutPreview(response: String) {
         try {
             var htmlContent = ""
 
-            // ၁။ Markdown ```html ... ``` ပါလာလျှင် ၎င်းကြားထဲက HTML ကို ဖြတ်ထုတ်မည်
             if (response.contains("```html")) {
                 val start = response.indexOf("```html") + 7
                 val end = response.indexOf("```", start)
@@ -366,7 +362,6 @@ class MainActivity : Activity() {
                     htmlContent = response.substring(start, end).trim()
                 }
             } 
-            // ၂။ HTML tags ပါဝင်မှု ရှိမရှိ ထပ်မံစစ်ဆေးခြင်း
             else if (response.contains("<html>")) {
                 val startIdx = response.indexOf("<html>")
                 val endIdx = response.lastIndexOf("</html>")
@@ -374,14 +369,12 @@ class MainActivity : Activity() {
                     htmlContent = response.substring(startIdx, endIdx + 7)
                 }
             } 
-            // ၃။ <!DOCTYPE html> စနစ်ကို စစ်ဆေးခြင်း
             else if (response.contains("<!DOCTYPE html>")) {
                 val startIndex = response.indexOf("<!DOCTYPE html>")
                 val endIndex = if (response.contains("</html>")) response.lastIndexOf("</html>") + 7 else response.length
                 htmlContent = response.substring(startIndex, endIndex)
             }
 
-            // ၄။ အကယ်၍ သာမန်စာသားသက်သက် ဖြစ်နေလျှင် App Builder Dashboard Card အဖြစ် Render လုပ်ပေးခြင်း
             if (htmlContent.isEmpty()) {
                 htmlContent = """
                 <html>
@@ -410,7 +403,6 @@ class MainActivity : Activity() {
                 previewArea.visibility = View.VISIBLE
                 webPreview.visibility = View.VISIBLE
                 
-                // WebView သို့ Component UI ပို့လွှတ်မောင်းနှင်ခြင်း
                 webPreview.loadDataWithBaseURL(null, htmlContent, "text/html", "UTF-8", null)
                 
                 tvLiveStatus.text = "● AI Builder Live Environment"
@@ -422,7 +414,6 @@ class MainActivity : Activity() {
         }
     }
 
-    // ✅ ဆောက်လုပ်ထားသော Web UI အား ဖုန်းသိုလှောင်မှုထဲသို .html ဖိုင်အဖြစ် ထုတ်ယူသိမ်းဆည်းပေးမည့် Export စနစ်
     private fun exportProject() {
         if (currentParsedHtml.isEmpty()) {
             Toast.makeText(this, "No layout available to export! Please build first.", Toast.LENGTH_SHORT).show()
@@ -431,8 +422,6 @@ class MainActivity : Activity() {
 
         try {
             val fileName = "Exported_App_${System.currentTimeMillis()}.html"
-            
-            // App-specific internal standard document directory တွင် သိမ်းဆည်းခြင်း
             val targetDir = getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS)
             val file = File(targetDir, fileName)
 
@@ -448,7 +437,6 @@ class MainActivity : Activity() {
     }
 
     private fun buildLoginScreenUI() {
-        // Dynamic Parser စနစ်ဖြင့် အစားထိုးထားပါသည်
     }
 
     private fun showFloatingPreview() {
@@ -632,10 +620,15 @@ class MainActivity : Activity() {
         editApiKey.setText(apiKey)
 
         btnCreateApiKey.setOnClickListener {
-            val intent = android.content.Intent(android.content.Intent.ACTION_VIEW, 
-                android.net.Uri.parse("[https://console.groq.com/keys](https://console.groq.com/keys)"))
-            startActivity(intent)
-            Toast.makeText(this, "🌐 Open Groq Console to create API Key", Toast.LENGTH_LONG).show()
+            previewArea.visibility = View.VISIBLE
+            webPreview.visibility = View.VISIBLE
+            webPreview.loadUrl("[https://console.groq.com/keys](https://console.groq.com/keys)")
+            
+            tvLiveStatus.text = "🌐 Opening Groq Console..."
+            tvLiveStatus.setTextColor(Color.parseColor("#F59E0B"))
+            
+            Toast.makeText(this, "🌐 Opening Groq Console in Preview Window", Toast.LENGTH_SHORT).show()
+            dialog.dismiss()
         }
 
         btnSave.setOnClickListener {
